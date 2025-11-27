@@ -45,18 +45,14 @@
 
 \begin{abstract}
 
-We discuss the approach of \cite{forster_improving_2025}, in improving robustness to model misspecification in Bayesian experimental design (BED). Their approach builds the misspecification into the optimal design paradigm. We discuss their main results, replicate their experiments, and extend upon them by examining how the flexibility of the auxiliary model effects the robustness of this method.
+We discuss the approach of Forster et al. (2025)~\cite{forster_improving_2025}, in improving robustness to model misspecification in Bayesian experimental design. Their approach builds the misspecification into the optimal design paradigm. We discuss their main results, replicate their experiments, and extend upon them by examining how the flexibility of the auxiliary model effects the robustness of this method.
 %%% Needs more detail! - ADDED some, but I don't think the last part I wrote is is brilliantly written
 \end{abstract}
 \color{SaddleBrown} % SaddleBrown color for the introduction
 
 \section*{Motivation}
 
-Bayesian experimental design (BED) is a commonly used method to efficiently select new data samples to maximise information gain about the model parameters \cite{smith_prediction-oriented_2023}. However, if the model is misspecified (i.e. cannot fit the true data generating process) then BED can fail spectacularly. For real world applications it is often the case that the model is misspecified, and thus BED is not necessarily applicable. 
-
-In principle, one could have thought to use a more flexible model class, however this discarded any useful prior information; making the problem harder to learn.
-
-The authors of \cite{forster_improving_2025}, suggest a more robust method by building the assumption of misspecification into the design process. To do this they build an extended model, mixing a flexible auxiliary model and the parametrised model. 
+Bayesian experimental design (BED) is a commonly used method to efficiently select new data samples to maximise information gain about the model parameters \cite{smith_prediction-oriented_2023}. However, if the model is misspecified (i.e. cannot fit the true data generating process) then BED can fail spectacularly. For real world applications it is often the case that the model is misspecified, and thus BED is not necessarily applicable.  One naive solution could be choosing a more flexible model class, however this discarded any useful prior information; making the problem harder to learn. The authors of \cite{forster_improving_2025}, suggest a more robust method by integrating the assumption of misspecification into the design process. To do this they build an extended model, mixing a flexible auxiliary model with the parametrised model. 
 
 
 \color{DarkSlateGray} % DarkSlateGray color for the rest of the content
@@ -102,15 +98,15 @@ We next define four models, each modelling an experiment output $y \in \mathcal{
 \[
 y \sim p_{\mathrm{model}}(y \mid \theta, \xi),
 \]
-where $\theta \sim p_\theta(\cdot)$ are the unknown model parameters;
+where $\theta \sim p_\theta(\cdot)$ is our prior over the model parameters;
 \item The auxiliary model,
 \[
 y \sim p_{\mathrm{aux}}(y \mid \varphi, \xi)
 \]
 governed by parameters $\varphi \sim p_\varphi(\cdot)$;
-\item The mixture of the two,
+\item The mixture of the two, for $Z \sim \mathrm{Bernoulli}(1-\varepsilon)$
 \[\begin{aligned}
-Z &\sim \mathrm{Bernoulli}(1-\varepsilon),\\[4pt]
+% Z &\sim \mathrm{Bernoulli}(1-\varepsilon),\\[4pt]
 y &\sim
 \begin{cases}
 p_{\mathrm{model}}(\,y\mid \theta,\xi) & \text{if } Z=1,\\[4pt]
@@ -122,11 +118,11 @@ p_{\mathrm{aux}}(\,y\mid \psi,\xi)   & \text{if } Z=0, \text{ and;}
 \end{itemize}
 \end{definition}
 
-With these in mind, we visualise the following possible configurations: the assumed model is well specified (case 1), the assumed model is misspecified (case 2) and the auxiliary model is well specified, or the assumed model and auxiliary model are misspecified (case 3).
+With these in mind, we visualise the following possible configurations: The assumed model is well specified (case 1), the assumed model is misspecified and the auxiliary model is well specified (case 2), or the assumed model and auxiliary model are misspecified (case 3). The robust method developed in \cite{forster_improving_2025} is only valid for cases 1,2.
 
 \input{MisspecificationVisual}
 
-Good experiments provide a lot of information about the model parameters. This is empirically described by the expected information gain of an experiment $\xi$.
+We wish to learn the parameters $\hat{\theta}$ that provide the ``best'' model of our true process. We aim to pick experiments so that we ``optimally'' obtain data from which to infer our model parameters. Good experiments provide a lot of information about $\theta$. This is empirically described by the expected information gain of an experiment $\xi$.
 
 \begin{definition}[Expected Information Gain (EIG)]
 \[
@@ -138,15 +134,15 @@ Good experiments provide a lot of information about the model parameters. This i
         \frac{
           p_{\mathrm{model}}(y \mid \theta,\xi)
         }{
-          p_{\mathrm{model}}(y \mid \xi)
+          p_{\mathrm{model}}(y)
         }
      \right],
 \]
 where
 \(
-p_{\mathrm{model}}(y \mid \xi)
-= \mathbb{E}_{p(\theta)}[p_{\mathrm{model}}(y \mid \theta,\xi)].
-\)
+p_{\mathrm{model}}(y)
+= \mathbb{E}_{p(\theta)}[p_{\mathrm{model}}(y \mid \theta)]
+\) is the prior on the model.
 \end{definition}
 
 Since we only care whether the auxiliary model explains discrepancies of the assumed model, we care little about the parameters, $\varphi$, of the auxiliary model. Hence, the version of EIG which focuses on predictive performance \cite{smith_prediction-oriented_2023} will be useful.
@@ -172,7 +168,7 @@ This measures how much observing $y$ at design $\xi$ improves predictions of
 $y^*$ at future design locations $\xi^*$.
 \end{definition}
 
-To measure how well our model fits the true data we compute the expected divergence between the model and the true data generating process.
+To measure how well our model fits the true data we compute the expected divergence between the model and the true model.
 
 \begin{definition}[Expected Divergence (ED)]
 \[
@@ -216,7 +212,7 @@ where $h_t = \{(\xi_i, y_i)\}_{i=1}^{t}$ is the history of the past experiments 
 
 \section*{Main Results}
 
-To obtain a robust procedure, \cite{forster_improving_2025} seek to maximise information gain in $\Omega = \{\theta,(\xi^{*},y^{*}), Z\}$, that is the parameters of the model, $\theta$, prediction on a new data point $(\xi^{*},y^{*})$, and whether our model is ``right'', $Z$. The following decomposition gives an intuitive understanding of why this may be the right approach.
+To obtain a robust procedure, \cite{forster_improving_2025} seek to maximise information gain in $\Omega = \{\theta,(\xi^{*},y^{*}), Z\}$, that is the parameters of the model, $\theta$, prediction on a new data point $(\xi^{*},y^{*})$, and whether our model is ``right'', $Z$. The following decomposition gives an intuitive understanding of  this approach.
 
 \begin{theorem}[EIG Decomposition]
 The expected information gain in 
@@ -239,63 +235,80 @@ where
 \[
 \mathrm{EIG}_{Z}(\xi_t \mid h_{t-1})
 =
-I(y_t ; Z \mid h_t, \xi_t).
+I(y_t ; Z \mid h_{t-1}, \xi_t). %%Should this be t-1 or t?
 \]
 \end{theorem}
 
-When we have high confidence in our model, $P(Z = 1 \mid h_{t-1}) \approx 1$, we select experiments that maximise the expected information gain in our model parameters, $\theta$. Whereas if we have low confidence in our model, $P(Z = 1 \mid h_{t-1}) \approx 0$, we select experiments that maximise expected predictive information gain in the auxiliary model.
+When we have high confidence in our model, $P(Z = 1 \mid h_{t-1}) \approx 1$, we select experiments that maximise the expected information gain in our model parameters, $\theta$. Whereas if we have low confidence in our model, $P(Z = 1 \mid h_{t-1}) \approx 0$, we select experiments that maximise expected predictive information gain in the auxiliary model. We want large $\mathrm{EIG}_Z$ as information about $Z$ tells us whether the assumed or auxiliary model fit the data better.
 
 \subsection*{Numerical Experiments}
 
-We utilise the same problem setting as \cite{forster_improving_2025}. The Michaelis-Menten kinetics model describes the reaction velocity, $y$, in terms of a substrate concentration $\xi \in [0,400].$ We take the same setup as \cite{forster_improving_2025}. We additionally examine how different levels of flexibility of the auxiliary model could effect the resulting experimental choice and ultimately quality of model of time. To do so we use the auxiliary GP model's lengthscale as a proxy for flexibility, where lengthscale values that are close to zero make are model fully flexible (noise like), and large lengthscale enforce a more spatially correlated structure. 
+We utilise the same problem setting as \cite{forster_improving_2025}. The Michaelis-Menten kinetics model describes the reaction velocity, $y$, in terms of a substrate concentration $\xi \in [0,400].$ We take the same setup as \cite{forster_improving_2025}. We additionally examine how different levels of flexibility of the auxiliary model could effect the resulting experimental choice and ultimately the quality of the model over time. To do so we use the auxiliary GP model's lengthscale as a proxy for flexibility, where lengthscale values that are close to zero make the model fully flexible (noise like), and large lengthscale enforce a more spatially correlated structure. 
 
 %% Experimental details go here!!!
 
 
 \begin{center}
 \includegraphics[width=\linewidth]{ig_s_1.pdf}
-\captionof{figure}{\color{Green} Reproductions for $s=1$}
-\end{center}
-
+%\captionof{figure}{\color{Green} Reproductions for $s=1$}
+\end{center}%
 \begin{center}
 \includegraphics[width=\linewidth]{ig_s_2.pdf}
-\captionof{figure}{\color{Green} Reproductions for $s=2$}
+\captionof{figure}{\color{Green} Robust EIG decomposition for $s=1$ and $s=2$}
 \end{center}
 
+
+In about half of the experiments in \cite{forster_improving_2025} one sees a growth in the information gain in $\theta$ followed by a sharp drop, see figures 2 (b) and (d). We hypothesise that the legends in the plots in \cite{forster_improving_2025} do not show the information gain but rather,
+    \[
+    P(Z=1 \mid h_{t}) \sum_{i=1}^t \mathrm{EIG}_\mathrm{model}(\xi_i \mid h_{i}).
+    \]
+    We think that multiplying the cumulative sum by $P(Z=1 \mid h_{t})$ is not well motivated, as this term does not arise naturally in the derivation. We believe this accounts for the increase and sharp drops in $IG$ that follow the behavior of $P(Z=1 \mid h_{t-1})$. In our view, presenting these quantities together can be misleading.
+    %Multiplying the cumulative sum by $P(Z=1 \mid h_{t})$ makes little sense, since it is not a quantity appearing naturally anywhere. This explains the increases and also the sharp drops observed in $\mathrm{IG}$ that follow $P(Z=1 \mid h_{t-1})$. We feel plotting these quantities is \emph{misleading}. 
+    %In our reproductions we do not observe this same increase. Given there is no code published alongside \cite{forster_improving_2025} we are not in any position to say why this is.
+
 \begin{center}
-\includegraphics[width=\linewidth]{figures/model_fit_s_3.pdf}
+\includegraphics[width=\linewidth]{model_fit_s_3.pdf}
 \captionof{figure}{\color{Green} Fitted models for $s=3$}
 \end{center}
 
+ In Figure 2 we show the assumed model and the auxiliary model fits after 1, 10, and 20 experiments. This is in the misspecified $s=3$ case, we see that the GP, i.e. the auxiliary model, is able to do a much better job of matching the true data distribution.
+\begin{center}
+\includegraphics[width=\linewidth]{ig_1_vs_3.pdf}
+\captionof{figure}{\color{Green} Information gain in $\theta$ for $s=1$ and $s=3$}
+\end{center}
 
-\begin{itemize}
-    \item In about half of the experiments in \cite{forster_improving_2025} one sees a growth in the information gain in $\theta$ followed by a sharp drop, see figures 2 (b) and (d). We hypothesise that the legends in such plots in \cite{forster_improving_2025} is misspecified - it is not the information gain in $\theta$ being plotted but rather the entire term associated with the model in the decomposition, i.e. $P(Z=1 \mid h_{t-1})\mathrm{EIG}_\mathrm{model}(\xi_t \mid h_{t-1})$. While this explains the sharp drop, it does not explain the increase. In our reproductions we do not observe this same increase. Given there is no code published alongside \cite{forster_improving_2025} we are not in any position to say why this is.
-    \item We see that when we decrease the length scale of the GP too much, i.e. make the auxiliary model more flexible, it diminishes some of the improvements that the robust EIG process has over the non-robust process. Further research on the relationship between the flexibility of the auxilliary model and the performance of the robust scheme could be very interesting.
-\end{itemize}
+In Figure 3 we visualize the information gain at each time step by either the robust or standard EIG procedure. For the well-specified case (s=1) the models operate the same as the optimization objectives coincide. For the misspecified case (s=3), the robust EIG method prefers gaining information for the auxiliary model and thus the IG in the assumed model is lower.  
 
-\section*{Extensions}
+\begin{center}
+\includegraphics[width=\linewidth]{model_fit_s_50_ls_5.pdf}
+\captionof{figure}{\color{Green} Fitted models for $s=50$ and $ls=5$}
+\end{center}
+
+In Figure 4 we see that when we decrease the length scale of the GP too much, i.e. make the auxiliary model more flexible, it diminishes some of the improvements that the robust EIG process has over the non-robust process. Further research on the relationship between the flexibility of the auxiliary model and the performance of the robust scheme could unearth interesting conclusions.
+
+\section*{ Possible Extensions}
 
 %\subsection*{Non-myopic policies}
 
-Until now we have been exploring myopic methods where we update the posterior, $p(\theta,h_{t})$, at every step and then optimise the EIG objective. This is both not optimal, as it does not consider experiments far into the future, and computationally intensive. However, following \cite{foster_deep_2021}, we could take a deterministic policy function $\pi$ that directly outputs experiments based on a history (i.e. $\xi_t = \pi(h_{t-1})$. With this viewpoint we can, under an optimal policy $\pi$, explore the distributions of, 
-$(\xi_1,\cdots,\xi_T) \in \mathcal{X}^T$. In this case we can compute the optimal policy under the auxiliary model $p(\xi^*)$ for EPIG updates. This will induce a different distribution $(\xi'_1,\cdots,\xi'_T) \in \mathcal{X}^T$. We can then use this second distribution to regularise our selections.
+% Until now we have been exploring myopic methods where we update the posterior, $p(\theta,h_{t})$, at every step and then optimise the EIG objective. This is both not optimal, as it does not consider experiments far into the future, and computationally intensive. However, following \cite{foster_deep_2021}, we could take a deterministic policy function $\pi$ that directly outputs experiments based on a history (i.e. $\xi_t = \pi(h_{t-1})$). With this viewpoint we can, under an optimal policy $\pi$, explore the distributions of, 
+% $(\xi_1,\cdots,\xi_T) \in \mathcal{X}^T$. In this case we can compute the optimal policy under the auxiliary model $p(\xi^*)$ for EPIG updates. This will induce a different distribution $(\xi'_1,\cdots,\xi'_T) \in \mathcal{X}^T$. We can then use this second distribution to regularise our selections.
 
-\vspace{0.5cm}
-\hrule
-\vspace{0.5cm}
+% \vspace{0.5cm}
+% \hrule
+% \vspace{0.5cm}
 
 %\subsection*{More general loss functions}
-If we chose another generalised uncertainty measure based on a Bregmann Divergence, $D_\phi(p||q)$, then we can think of the optimal design choice being,
-\[
-\xi_t = \argmax_{\xi_t} \mathbb{E}_{y_t\,\sim\,p_{\text{ext}}(\cdot\mid \xi_t,h_{t-1})}\left[D_\phi(p(\theta\mid h_t)||p(\theta\mid h_{t-1}))\right],
-\]
-i.e. the expected Bregmann divergence from posterior to prior. For $\phi = \log$ we obtain exactly the traditional expected information gain.
+% If we chose another generalised uncertainty measure based on a Bregmann Divergence, $D_\phi(p||q)$, then we can think of the optimal design choice being,
+% \[
+% \xi_t = \argmax_{\xi_t} \mathbb{E}_{y_t\,\sim\,p_{\text{ext}}(\cdot\mid \xi_t,h_{t-1})}\left[D_\phi(p(\theta\mid h_t)||p(\theta\mid h_{t-1}))\right],
+% \]
+% i.e. the expected Bregmann divergence from posterior to prior. For $\phi = \log$ we obtain exactly the traditional expected information gain.
 
-\vspace{0.5cm}
-\hrule
-\vspace{0.5cm}
+% \vspace{0.5cm}
+% \hrule
+% \vspace{0.5cm}
 
-If we take the viewpoint of \cite{smith_prediction-oriented_2023} that BALD should really be replaced by EPIG then one might wonder what happens if $\theta$ is removed from $\Omega$, i.e. $\tilde{\Omega} = \{(\xi^*,y^*,Z\}$. 
+If we take the viewpoint of \cite{smith_prediction-oriented_2023} that BALD \cite{houlsby_bayesian_2011} should be replaced by EPIG then removing $\theta$ from $\Omega$, i.e. $\tilde{\Omega} = \{(\xi^*,y^*,Z\}$ is sensible.
 
 \begin{theorem}[Alternative EIG] Using $\mathrm{EIG}_{\tilde{\Omega}}$ we have that,
 \begin{align*}&I(y;\tilde\Omega) = I(y;Z) + \mathbb{E}_{P(Z)}\left[ I(y;(\xi^*,y^*)\mid Z)\right]\\
@@ -303,19 +316,34 @@ If we take the viewpoint of \cite{smith_prediction-oriented_2023} that BALD shou
 \end{theorem}
 This alternative approach should then reap all the benefits that EPIG has over BALD. 
 
+% \vspace{0.5cm}
+% \hrule\vspace{0.5cm}
+
+
+% As well as model misspecification it is worth exploring what happens under a distribution shift between our prior on experiments, $p(\xi^*)$, and what we actually observe in practice (i.e. prior misspecification). Here we could take an approach similar to, \cite{tang_generalization_2025}, and assume a ``true'' prior, $p^*(\xi^*)$ and take an adjusted EIG,
+
+% \[
+% \mathrm{EIG\text{-}Adj}(\xi_t)
+% = \mathrm{EIG}(\xi_t)\!\cdot\!\left(1 - \lambda
+% \underbrace{\frac{\mathrm{MMD}\big(h_{t-1}\cup\{\xi_t\},\,p^*(\xi^*)\big)}
+% {\mathrm{MMD}\big(h_{t-1},p^*(\xi^*)\big)}}_{\text{Robust Ratio}}\right),
+% \]
+% here we compute the Maximum Mean Discrepancy ($\mathrm{MMD}$) between our samples and the true $p^*(\xi^*)$, $\lambda$ is a hyper-parameter that can be tuned to determine the impact of the robustness ratio.
+
+
 \vspace{0.5cm}
 \hrule\vspace{0.5cm}
 
+In \cite{catanach_metrics_2023} the Expected Generalised Information Gain (EGIG) is presented which measures the information gain provided by an experiment under the true model. 
 
-As well as model misspecification it is worth exploring what happens under a distribution shift between our prior on experiments, $p(\xi^*)$, and what we actually observe in practice (i.e. prior misspecification). Here we could take an approach similar to, \cite{tang_generalization_2025}, and assume a ``true'' prior, $p^*(\xi^*)$ and take an adjusted EIG,
+\begin{definition}[EGIG]
 
-\[
-\mathrm{EIG\text{-}Adj}(\xi_t)
-= \mathrm{EIG}(\xi_t)\!\cdot\!\left(1 - \lambda
-\underbrace{\frac{\mathrm{MMD}\big(h_{t-1}\cup\{\xi_t\},\,p^*(\xi^*)\big)}
-{\mathrm{MMD}\big(h_{t-1},p^*(\xi^*)\big)}}_{\text{Robust Ratio}}\right),
-\]
-here we compute the Maximum Mean Discrepancy ($\mathrm{MMD}$) between our samples and the true $p^*(\xi^*)$, $\lambda$ is a hyper-parameter that can be tuned to determine the impact of the robustness ratio.
+\[\mathrm{EGIG}(\xi) = \mathbb{E}_{p_\mathrm{true}(y|\xi)}\left[\log \frac{p_\mathrm{model}(y\mid \theta, \xi)}{p_\mathrm{model}(y)}\right].\]
+
+\end{definition}
+
+This provides a measure of the increase in information when going from the prior to the posterior under the assumption of the true model. If we instead calculate this under the assumption of the auxiliary model then we obtain what \cite{catanach_metrics_2023} finds to be a robust metric to model misspecification.
+
 
 
 %----------------------------------------------------------------------------------------
@@ -336,7 +364,7 @@ here we compute the Maximum Mean Discrepancy ($\mathrm{MMD}$) between our sample
 
 \section*{Conclusions}
 
-We have explored results from \cite{forster_improving_2025} and replicated their experiments. We have identified the flexibility of the auxiliary model as being key to whether we are able to determine a robust fit to the parameters of our model, $\theta$, in the misspecified case. 
+We have explored results from \cite{forster_improving_2025} and replicated their experiments. We have identified the flexibility of the auxiliary model as being key to whether we are able to determine a robust fit to the parameters of our model, $\theta$, in the misspecified case. To explore the potential benefits of this robust approach more complicated scenarios need to be explored.
 
 
 

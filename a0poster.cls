@@ -137,15 +137,15 @@
 
 
 %\voffset -1in
-%\hoffset -1in
+\hoffset -1.8cm
 
 \setlength{\headheight}{0 cm}
 \setlength{\headsep}{0 cm}
-\setlength{\topmargin}{3 cm} %% 3 cm for unprintable at top
+\setlength{\topmargin}{4 cm} %% 3 cm for unprintable at top
 			     %% (landscape) + 2 cm from border
-\setlength{\oddsidemargin}{3 cm} %% 3 cm for unprintable at left
+\setlength{\oddsidemargin}{4 cm} %% 3 cm for unprintable at left
 			    	 %% (landscape) + 2 cm from border
-\setlength{\evensidemargin}{3 cm} %% 3 cm for unprintable at left
+\setlength{\evensidemargin}{4 cm} %% 3 cm for unprintable at left
 \setlength{\topskip}{0 cm}
 
 \input{a0size.sty}
