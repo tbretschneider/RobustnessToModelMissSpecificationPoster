@@ -1,0 +1,92 @@
+\usepackage{multicol} % This is so we can have multiple columns of text side-by-side
+\columnsep=80pt % This is the amount of white space between the columns in the poster
+\columnseprule=3pt % This is the thickness of the black line between the columns in the poster
+
+\usepackage[svgnames]{xcolor} % Specify colors by their 'svgnames', for a full list of all colors available see here: http://www.latextemplates.com/svgnames-colors
+
+\usepackage{times} % Use the times font
+%\usepackage{palatino} % Uncomment to use the Palatino font
+
+\usepackage{graphicx} % Required for including images
+\graphicspath{{figures/}} % Location of the graphics files
+\usepackage{booktabs} % Top and bottom rules for table
+\usepackage[font=small,labelfont=bf]{caption} % Required for specifying captions to tables and figures
+\usepackage{amsfonts, amsmath, amsthm, amssymb} % For math fonts, symbols and environments
+\usepackage{wrapfig} % Allows wrapping text around tables and figures
+
+\usepackage{xcolor}
+
+\usepackage{mdframed}      % breakable framed boxes with background
+\usepackage{etoolbox}      % \AtBeginEnvironment / \AtEndEnvironment
+\usepackage{multicol}      % example showing column wrapping (optional)
+
+% Your theorem/definition setup (unchanged)
+\newtheorem{theorem}{Theorem}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+% Define colors
+\definecolor{lightgreen}{RGB}{220,255,220}
+\definecolor{lightgray}{RGB}{245,245,245}
+
+% mdframed settings for the body only (no visible frame, only background)
+\newmdenv[
+  backgroundcolor=lightgray,
+  linecolor=lightgray,    % same as background -> no visible border
+  innerleftmargin=16pt,
+  innerrightmargin=16pt,
+  innertopmargin=14pt,
+  innerbottommargin=14pt,
+  skipabove=\topsep,
+  skipbelow=\topsep,
+  nobreak=false,
+  splittopskip=14pt,
+  splitbottomskip=14pt
+]{defbodybox}
+
+\newmdenv[
+  backgroundcolor=lightgreen,
+  linecolor=lightgreen,
+  innerleftmargin=16pt,
+  innerrightmargin=16pt,
+  innertopmargin=14pt,
+  innerbottommargin=14pt,
+  skipabove=\topsep,
+  skipbelow=\topsep,
+  nobreak=false,
+  splittopskip=14pt,
+  splitbottomskip=14pt
+]{thmbodybox}
+
+% in preamble
+\setlength{\abovedisplayskip}{12pt}
+\setlength{\belowdisplayskip}{12pt}
+\setlength{\abovedisplayshortskip}{12pt}
+\setlength{\belowdisplayshortskip}{12pt}
+
+
+% Surround only the *body* of the existing environments.
+% The theorem/definition header produced by \begin{definition} stays outside the colored box.
+\AtBeginEnvironment{definition}{\begin{defbodybox}\ignorespaces}
+\AtEndEnvironment{definition}{\end{defbodybox}}
+
+\AtBeginEnvironment{theorem}{\begin{thmbodybox}\ignorespaces}
+\AtEndEnvironment{theorem}{\end{thmbodybox}}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning,shapes.geometric}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\begin{document}
+
+%----------------------------------------------------------------------------------------
+%	POSTER HEADER 
+%----------------------------------------------------------------------------------------
+
+% The header is divided into three boxes:
+% The first is 55% wide and houses the title, subtitle, names and university/organization
+% The second is 25% wide and houses contact information
+% The third is 19% wide and houses a logo for your university/organization or a photo of you
+% The widths of these boxes can be easily edited to accommodate your content as you see fit
+
